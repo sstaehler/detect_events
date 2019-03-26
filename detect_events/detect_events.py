@@ -307,10 +307,10 @@ def play(path_LF, path_HF, nevent=40):
     plt.plot(-1, -1, 'o', c='C0', label='missed')
     plt.legend()
     plt.title('Your detection results after %d events' % nevent)
-    plt.set_xlabel('distance [degree]')
-    plt.set_ylabel('magnitude $M_W$')
-    plt.set_ylim(2, 4)
-    plt.set_xlim(0, 180)
+    plt.xlabel('distance [degree]')
+    plt.ylabel('magnitude $M_W$')
+    plt.ylim(2, 4)
+    plt.xlim(0, 180)
     plt.show()
 
 
