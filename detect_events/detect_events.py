@@ -12,8 +12,7 @@ from obspy import read
 import instaseis
 from obspy import UTCDateTime as utct
 
-def pickify(fig, ax):
-    global dist, M, t0
+def pickify(fig, ax, dist, M, t0):
     keymap = {'w': 0, 'e': 1}
     def onkey(event):
         global events
@@ -196,39 +195,42 @@ def select_and_add(st, db_HF, db_LF, M, dist):
 
     return st_LF, st_HF, t0
 
-events = []
-st = read('VBB_3days_VEL.mseed')
-# path_HF = '/mnt/instaseis/databases/Mars_2s_deep/'
-# path_lF = '/mnt/instaseis/databases/Mars_2s_deep/'
-#path_LF = '/mnt/instaseis/databases/blindtestmodels_10s/EH45TcoldCrust1b_10s/'
 
-# The good ones
-path_LF = 'http://instaseis.ethz.ch/blindtest_5s/EH45TcoldCrust1b_5s'
-path_HF = 'http://instaseis.ethz.ch/blindtest_1s/EH45TcoldCrust1b_Q100_1s'
-db_HF = instaseis.open_db(path_HF)
-db_LF = instaseis.open_db(path_LF)
+def play(path_LF, path_HF, nevent=40):
+    global events
+    events = []
+    st = read('VBB_3days_VEL.mseed')
 
-nevent = 40
-for i in range(0, nevent):
-    M, dist = create_event(M_min=2.0, M_max=4.0)
-    if autoreject(M, dist):
-        events.append([dist, M, 0])
-        string = '%3d/%3d: Below threshold: Event in %d deg with M%3.1f'
-    elif autoaccept(M, dist):
-        events.append([dist, M, 1])
-        string = '%3d/%3d: Above threshold: Event in %d deg with M%3.1f'
-    else:
-        st_LF, st_HF, t0 = select_and_add(st, db_HF, db_LF, M, dist)
-        fig, ax = plot_spec(st_HF=st_HF, st_LF=st_LF, winlen_sec_LF=50.)
-        picks = pickify(fig, ax)
-        if events[-1][-1] == 1:
-            string = '%3d/%3d: Found event in %d deg with M%3.1f'
+    db_HF = instaseis.open_db(path_HF)
+    db_LF = instaseis.open_db(path_LF)
+    for i in range(0, nevent):
+        M, dist = create_event(M_min=2.0, M_max=4.0)
+        if autoreject(M, dist):
+            events.append([dist, M, 0])
+            string = '%3d/%3d: Below threshold: Event in %d deg with M%3.1f'
+        elif autoaccept(M, dist):
+            events.append([dist, M, 1])
+            string = '%3d/%3d: Above threshold: Event in %d deg with M%3.1f'
         else:
-            string = '%3d/%3d: Missed event in %d deg with M%3.1f'
-    print(string % (i, nevent, dist, M))
+            st_LF, st_HF, t0 = select_and_add(st, db_HF, db_LF, M, dist)
+            fig, ax = plot_spec(st_HF=st_HF, st_LF=st_LF, winlen_sec_LF=50)
+            picks = pickify(fig, ax, M=M, dist=dist, t0=t0)
+            if events[-1][-1] == 1:
+                string = '%3d/%3d: Found event in %d deg with M%3.1f'
+            else:
+                string = '%3d/%3d: Missed event in %d deg with M%3.1f'
+        print(string % (i, nevent, dist, M))
+    with open('result.txt', 'a') as f:
+        for event in events:
+            plt.plot(event[0], event[1], 'o', c='C%d' % event[2])
+            f.write('%5.1f,  %4.2f, %d \n' % (event[0], event[1], event[2]))
+    plt.show()
 
-with open('result.txt', 'a') as f:
-    for event in events:
-        plt.plot(event[0], event[1], 'o', c='C%d' % event[2])
-        f.write('%5.1f,  %4.2f, %d \n' % (event[0], event[1], event[2]))
-plt.show()
+
+if __name__ == '__main__':
+    nevent = 40
+
+    # The good ones
+    path_LF = 'http://instaseis.ethz.ch/blindtest_5s/EH45TcoldCrust1b_5s'
+    path_HF = 'http://instaseis.ethz.ch/blindtest_1s/EH45TcoldCrust1b_Q100_1s'
+    play(path_LF, path_HF, nevent)
