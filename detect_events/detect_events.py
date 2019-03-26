@@ -4,13 +4,13 @@
 """
 __author__ = "Simon Staehler"
 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
-from obspy.signal.util import next_pow_2
-from obspy import read
 import instaseis
-from obspy import UTCDateTime as utct
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+import numpy as np
+from obspy import read, UTCDateTime as utct
+from obspy.signal.util import next_pow_2
+
 
 def pickify(fig, ax, dist, M, t0):
     keymap = {'w': 0, 'e': 1}
