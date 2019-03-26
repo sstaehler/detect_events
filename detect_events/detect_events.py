@@ -8,8 +8,66 @@ import instaseis
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import rc
+from matplotlib.patches import Rectangle
 from obspy import read, UTCDateTime as utct
 from obspy.signal.util import next_pow_2
+
+# activate latex text rendering
+rc('text', usetex=True)
+
+
+def __dayplot_set_x_ticks(ax, starttime, endtime, sol=False):
+    """
+    Sets the xticks for the dayplot.
+    """
+
+    # day_break = endtime - float(endtime) % 86400
+    # day_break -= float(day_break) % 1
+    hour_ticks = []
+    ticklabels = []
+    interval = endtime - starttime
+    interval_h = interval / 3600.
+    ts = utct(starttime)
+    tick_start = utct(ts.year, ts.month, ts.day, ts.hour)
+
+    if 0 < interval <= 60:
+        step = 10
+    elif 60 < interval <= 300:
+        step = 30
+    elif 300 < interval <= 900:
+        step = 120
+    elif 900 < interval <= 3600:
+        step = 300
+    elif 3600 < interval <= 18000:
+        step = 1800
+    elif 18000 < interval <= 43200:
+        step = 3600
+    elif 43200 < interval <= 86400:
+        step = 4 * 3600
+    elif 86400 < interval:
+        step = 12 * 3600
+    step_h = step / 3600.
+
+    # for ihour in np.arange(0, interval_h + step_h * 2, step_h):
+    for ihour in np.arange(0, interval_h + 2 + step_h, step_h):
+        hour_tick = tick_start + ihour * 3600.
+        hour_ticks.append(hour_tick)
+        if sol:
+            ticklabels.append(utct(hour_tick).strftime('%H:%M:%S%nSol %j'))
+        else:
+            ticklabels.append(utct(hour_tick).strftime('%H:%M:%S%n%Y-%m-%d'))
+
+    hour_ticks_minor = []
+    for ihour in np.arange(0, interval_h, 1):
+        hour_tick = tick_start + ihour * 3600.
+        hour_ticks_minor.append(hour_tick)
+
+    ax.set_xticks(hour_ticks)
+    ax.set_xticks(hour_ticks_minor, minor=True)
+    ax.set_xticklabels(ticklabels)
+    ax.set_xlim(float(starttime),
+                float(endtime))
 
 
 def pickify(fig, ax, dist, M, t0):
@@ -26,11 +84,18 @@ def pickify(fig, ax, dist, M, t0):
 
         ax.axvline(x=t0 + dist * (66 / 2.5), color='lightgreen', lw=2)
         ax.axvline(x=t0 + dist * (66 / 3.5), color='lightgreen', lw=2)
+        rect = Rectangle(xy=(t0 + dist * (66 / 3.5), 1),
+                         width=(dist * (66. / 2.5 - 66. / 3.5)),
+                         height=-1, facecolor='lightgreen', fill=True,
+                         alpha=0.2)
+        ax.add_patch(rect)
 
         fig.suptitle(('Event: Magnitude %3.1f in %3d degree distance. '
-                     ' Press "q" to save, "r" to remove (in case of wrong '
-                      'pick)')
-                     % (M, dist))
+                      ' Press ' + r'\textbf{q}' + ' to save, ' +
+                      r'\textbf{r}' + ' to remove (in case of wrong pick)')
+                     % (M, dist),
+                     fontsize=14, bbox=dict(facecolor='white', linewidth=1.5,
+                                            edgecolor='red', alpha=0.7))
         fig.canvas.draw()
 
 
@@ -120,11 +185,16 @@ def plot_spec(st_HF, st_LF, winlen_sec_LF=200, winlen_sec_HF=10., overlap=0.5):
     for ax in [ax_spec_HF, ax_seis_LF]:
         plt.setp(ax.get_xticklabels(), visible=False)
 
+    __dayplot_set_x_ticks(ax_spec_LF, t[0], t[-1])
+
     # Axis with colorbar
     mappable = ax_spec_HF.collections[0]
     cb = plt.colorbar(mappable=mappable, cax=ax_cb)
     ax_cb.set_ylabel('PSD (m/s)/Hz')
-    fig.suptitle('Press "e" for event detected, "w" for none detected')
+    fig.suptitle('Press ' + r'\textbf{e}' + ' for event detected, ' +
+                 r'\textbf{w} for none detected',
+                 fontsize=14, bbox=dict(facecolor='white', linewidth=1.5,
+                                        edgecolor='red', alpha=0.7))
 
 
     return fig, ax_spec_LF
