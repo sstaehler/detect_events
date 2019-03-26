@@ -27,6 +27,27 @@ it to
     detect_events/data/
     
     
+# Play the game
+Launch the game with
+
+    detect_marsquakes 
+    
+A window with (synthetic or real) noise and a marsquake hidden inside will appear. The upper part 
+shows the waveforms filtered above and below 1 Hz, the lower part shows spectrograms above and below 1 
+Hz. 
+
+If you spotted the event, press **e** 
+If you did not, press **w**
+
+
+
+Afterwards, the arrival window of the Rayleigh wave will be marked. If you correctly identified the time window, press **q** to save it, if you had identified noise
+as an event, press **r** to remove your detection from
+the database.
+
+After 40 events, the code will show you your distance-dependent detection threshold.
+    
+    
 
 
 

@@ -305,10 +305,14 @@ def play(path_LF, path_HF, nevent=40):
     plt.show()
 
 
-if __name__ == '__main__':
+def main():
     nevent = 40
 
     # The good ones
     path_LF = 'http://instaseis.ethz.ch/blindtest_5s/EH45TcoldCrust1b_5s'
     path_HF = 'http://instaseis.ethz.ch/blindtest_1s/EH45TcoldCrust1b_Q100_1s'
     play(path_LF, path_HF, nevent)
+
+
+if __name__ == '__main__':
+    main()

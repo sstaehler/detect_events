@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+import argparse
+
+from detect_events import play
+
+if __name__ == '__main__':
+    helptext = 'Locate events in (real or synthetic) Martian noise'
+    parser = argparse.ArgumentParser(helptext)
+    parser.add_argument('nevent', default=10, type=int,
+                        help='Number of events to create')
+    args = parser.parse_args()
+
+    # The good ones
+    path_LF = 'http://instaseis.ethz.ch/blindtest_5s/EH45TcoldCrust1b_5s'
+    path_HF = 'http://instaseis.ethz.ch/blindtest_1s/EH45TcoldCrust1b_Q100_1s'
+    play(path_LF, path_HF, args.nevent)

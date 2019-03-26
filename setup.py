@@ -21,6 +21,5 @@ setup(
     author_email='mail@simonstaehler.com',
     description='Detect synthetic Marsquakes in real seismic noise',
     install_requires=['numpy', 'scipy', 'matplotlib', 'obspy', 'instaseis'],
-    entry_points={'console_scripts':
-                      ['detect_events = detect_events.detect_events:play', ], }
+    scripts=['bin/detect_marsquakes'],
     )
