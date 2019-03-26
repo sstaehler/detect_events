@@ -4,6 +4,8 @@
 """
 __author__ = "Simon Staehler"
 
+import os
+
 import instaseis
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
@@ -15,6 +17,8 @@ from obspy.signal.util import next_pow_2
 
 # activate latex text rendering
 rc('text', usetex=True)
+DATA_PATH = os.path.join(os.path.dirname(__file__),
+                         'data')
 
 
 def __dayplot_set_x_ticks(ax, starttime, endtime, sol=False):
@@ -269,7 +273,11 @@ def select_and_add(st, db_HF, db_LF, M, dist):
 def play(path_LF, path_HF, nevent=40):
     global events
     events = []
-    st = read('VBB_3days_VEL.mseed')
+    fnam = os.path.join(DATA_PATH, 'VBB_3days_VEL.mseed')
+    if not os.path.exists(fnam):
+        fnam = os.path.join(DATA_PATH, 'VBB_3days_VEL_SYNT.mseed')
+
+    st = read(fnam)
 
     db_HF = instaseis.open_db(path_HF)
     db_LF = instaseis.open_db(path_LF)

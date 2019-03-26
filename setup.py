@@ -6,15 +6,21 @@ Some python tools for the InSight mars mission.
 :copyright:
     Simon Stähler (mail@simonstaehler.com), 2019
 '''
-from setuptools import setup, find_packages
+from os.path import join as pjoin
+
+from setuptools import setup
 
 setup(
     name='detect_events',
     version='0.1',
-    packages=find_packages(),
+    packages=['detect_events'],
+    package_data={'detect_events': [pjoin('data', '*')]},
     url='https://github.com/sstaehler/detect_events',
     license='GPLv3',
     author='Simon Staehler',
     author_email='mail@simonstaehler.com',
-    description='Detect synthetic Marsquakes in real seismic noise'
+    description='Detect synthetic Marsquakes in real seismic noise',
+    install_requires=['numpy', 'scipy', 'matplotlib', 'obspy', 'instaseis'],
+    entry_points={'console_scripts':
+                      ['detect_events = detect_events.detect_events:play', ], }
     )
